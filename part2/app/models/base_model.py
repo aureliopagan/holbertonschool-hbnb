@@ -1,24 +1,19 @@
+import uuid
+from datetime import datetime
+
 class BaseModel:
     def __init__(self):
-        self.id = self.generate_id()
-        self.created_at = self.get_current_time()
-        self.updated_at = self.created_at
-
-    def generate_id(self):
-        import uuid
-        return str(uuid.uuid4())
-
-    def get_current_time(self):
-        from datetime import datetime
-        return datetime.now()
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
 
     def save(self):
-        self.updated_at = self.get_current_time()
-        # Logic to save the instance to storage
+        """Update the updated_at timestamp."""
+        self.updated_at = datetime.now()
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat(),
-        }
+    def update(self, data):
+        """Update attributes based on a dictionary."""
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        self.save()

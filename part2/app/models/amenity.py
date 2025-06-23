@@ -1,7 +1,6 @@
-class Amenity:
-    def __init__(self, name, description=""):
-        self.name = name
-        self.description = description
+from app.models.base_model import BaseModel
 
-    def __str__(self):
-        return f"Amenity(name={self.name}, description={self.description})"
+class Amenity(BaseModel):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name[:50]

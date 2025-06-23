@@ -1,9 +1,22 @@
-class Place:
-    def __init__(self, name, location):
-        self.name = name
-        self.location = location
+from app.models.base_model import BaseModel
+from app.models.user import User
 
-    def __str__(self):
-        return f"Place(name={self.name}, location={self.location})"
+class Place(BaseModel):
+    def __init__(self, title, description, price, latitude, longitude, owner):
+        super().__init__()
+        self.title = title[:100]
+        self.description = description
+        self.price = float(price)
+        self.latitude = float(latitude)
+        self.longitude = float(longitude)
+        if not isinstance(owner, User):
+            raise ValueError("owner must be a User instance")
+        self.owner = owner
+        self.reviews = []
+        self.amenities = []
 
-    # Additional methods for place-related functionality can be added here.
+    def add_review(self, review):
+        self.reviews.append(review)
+
+    def add_amenity(self, amenity):
+        self.amenities.append(amenity)

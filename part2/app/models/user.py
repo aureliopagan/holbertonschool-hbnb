@@ -1,16 +1,9 @@
-class User:
-    def __init__(self, username, email):
-        self.username = username
+from app.models.base_model import BaseModel
+
+class User(BaseModel):
+    def __init__(self, first_name, last_name, email, is_admin=False):
+        super().__init__()
+        self.first_name = first_name[:50]
+        self.last_name = last_name[:50]
         self.email = email
-
-    def __str__(self):
-        return f"User(username={self.username}, email={self.email})"
-
-    def update_email(self, new_email):
-        self.email = new_email
-
-    def get_username(self):
-        return self.username
-
-    def get_email(self):
-        return self.email
+        self.is_admin = is_admin
