@@ -1,4 +1,5 @@
 Flask
+Flask-restx
 Flask-RESTful
 Flask-SQLAlchemy
 Flask-Migrate
