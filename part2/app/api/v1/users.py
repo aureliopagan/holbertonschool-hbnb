@@ -20,7 +20,7 @@ class UserList(Resource):
         """Register a new user"""
         user_data = api.payload
 
-        # Check email uniqueness
+        # Simulate email uniqueness check
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
@@ -59,6 +59,7 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+        
         return {
             'id': user.id,
             'first_name': user.first_name,
@@ -71,14 +72,16 @@ class UserResource(Resource):
     @api.response(404, 'User not found')
     @api.response(400, 'Invalid input data')
     def put(self, user_id):
-        """Update user information"""
+        """Update a user's information"""
         user_data = api.payload
         
+        # Check if user exists
+        user = facade.get_user(user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
+
         try:
             updated_user = facade.update_user(user_id, user_data)
-            if not updated_user:
-                return {'error': 'User not found'}, 404
-            
             return {
                 'id': updated_user.id,
                 'first_name': updated_user.first_name,
