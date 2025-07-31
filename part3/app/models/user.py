@@ -14,6 +14,15 @@ class User(BaseModel):
     places = relationship('Place', backref='user', lazy=True)
     reviews = relationship('Review', backref='user', lazy=True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "is_admin": self.is_admin
+        }
+
 
     def hash_password(self, password):
         from app import bcrypt

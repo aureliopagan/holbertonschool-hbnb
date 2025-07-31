@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 
@@ -16,6 +16,29 @@ user_model = api.model('User', {
 
 @api.route("/")
 class UserList(Resource):
+
+
+    @api.response(200, 'List of users retrieved successfully')
+    @api.response(403, 'Admin privileges required')
+    @jwt_required()
+    def get(self):
+        """Retrieve all users (admin only)"""
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+
+        if not current_user or not current_user.is_admin:
+            return {"error": "Admin privileges required"}, 403
+
+        users = facade.user_repo.get_all()
+        return [
+            {
+                "id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email
+            } for user in users
+        ], 200
+
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
@@ -62,11 +85,17 @@ class UserResource(Resource):
     @api.response(404, 'User not found')
     @jwt_required()
     def put(self, user_id):
-        current_user = get_jwt_identity()
+        # FIX: Use the new JWT format
+        current_user_id = get_jwt_identity()    # This is now a string (user ID)
+        claims = get_jwt()                      # This gets the additional claims
+        is_admin = claims.get('is_admin', False)
+        
         user = facade.get_user(user_id)
         if not user:
             return {"error": "User not found"}, 404
-        if user.id != current_user["id"] and not current_user.get('is_admin', False):
+            
+        # FIX: Compare string to string
+        if user.id != current_user_id and not is_admin:
             return {"error": "Unauthorized action."}, 403
         
         updated_details = api.payload
@@ -77,3 +106,19 @@ class UserResource(Resource):
             'last_name': updated_user.last_name,
             'email': updated_user.email
         }, 200
+    
+
+@api.route('/public/')
+class PublicUserList(Resource):
+    def get(self):
+        """Get all non-admin users (public endpoint)"""
+        # Use the existing facade instead of creating a new repository
+        users = facade.user_repo.get_all()
+        non_admins = [user for user in users if not user.is_admin]
+        return [{
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "is_admin": user.is_admin
+        } for user in non_admins], 200

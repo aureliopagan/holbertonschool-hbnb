@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 
@@ -49,8 +49,13 @@ class PlaceList(Resource):
     @jwt_required()
     def post(self):
         """Register a new place"""
-        current_user = get_jwt_identity()
+        current_user_id = get_jwt_identity()  # This is now a string (user ID)
+        claims = get_jwt()  # This gets the additional claims
+        is_admin = claims.get('is_admin', False)
+        
         place_data = api.payload
+        place_data['owner_id'] = current_user_id  # Set the owner_id
+        
         new_place = facade.create_place(place_data)
         return {
             'id': new_place.id,
@@ -59,10 +64,10 @@ class PlaceList(Resource):
             'price': new_place.price,
             'latitude': new_place.latitude,
             'longitude': new_place.longitude,
-            'owner_id': current_user["id"],
+            'owner_id': current_user_id,
             'amenities': [
                 {
-                    'id': amenity.id, # Remove ID field if not needed
+                    'id': amenity.id,
                     'name': amenity.name
                 } for amenity in new_place.amenities
             ]
@@ -125,28 +130,34 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
-        current_user = get_jwt_identity()
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+        if not current_user:
+            return {"error": "Unauthorized"}, 401
+
         place = facade.get_place(place_id)
-        if place.owner_id != current_user["id"] and not current_user.get('is_admin', False):
-            return {"error": "Unauthorized action"}, 403
         if not place:
             return {"error": "Place not found"}, 404
-        
-        updated_details = api.payload
+
+        if place.owner_id != current_user.id and not current_user.is_admin:
+            return {"error": "Unauthorized action"}, 403
+
+        updated_details = api.payload or {}
+
+        # Handle amenities
         updated_amenities = []
         for amenity_id in updated_details.get('amenities', []):
             amenity = facade.get_amenity(amenity_id)
             if amenity:
                 updated_amenities.append(amenity)
-
         updated_details['amenities'] = updated_amenities
 
+        # If updating owner_id (not common), validate that new owner exists
         if 'owner_id' in updated_details:
-            updated_owner = facade.get_user(updated_details['owner_id'])
-            if updated_owner:
-                updated_details["owner_id"] = updated_owner
-            else:
+            new_owner = facade.get_user(updated_details['owner_id'])
+            if not new_owner:
                 return {"error": "Owner not found"}, 404
-            
+            updated_details['owner_id'] = new_owner.id
+
         facade.update_place(place_id, updated_details)
         return {"message": "Place updated successfully"}, 200

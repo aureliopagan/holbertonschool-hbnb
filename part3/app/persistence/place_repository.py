@@ -1,6 +1,6 @@
 from app.persistence.repository import SQLAlchemyRepository
-
+from app.models.place import Place
 
 class PlaceRepository(SQLAlchemyRepository):
-    def __init__(self, model):
-        super().__init__(model)
+    def __init__(self):
+        super().__init__(Place)

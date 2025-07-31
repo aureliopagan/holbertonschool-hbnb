@@ -10,10 +10,10 @@ from app.models.review import Review
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = UserRepository(User)
-        self.place_repo = PlaceRepository(Place)
-        self.review_repo = AmenityRepository(Review)
-        self.amenity_repo = ReviewRepository(Amenity)
+        self.user_repo = UserRepository()        # NO arguments
+        self.place_repo = PlaceRepository()      # NO arguments  
+        self.amenity_repo = AmenityRepository()  # NO arguments
+        self.review_repo = ReviewRepository()
 
 
     """User methods"""
