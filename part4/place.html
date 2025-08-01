@@ -1,41 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Place Details</title>
-<link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Details</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <nav>
-    <a href="index.html" class="logo">HBNB</a>
-    <a href="login.html" class="login-button">Login</a>
-  </nav>
-</header>
-<main>
-  <section id="place-info">
-    <h1 id="place-name">Loading...</h1>
-    <img id="place-image" src="" alt="Place Image" />
-    <p>Host: <span id="place-host"></span></p>
-    <p>Price: $<span id="place-price"></span> per night</p>
-    <p>Description: <span id="place-description"></span></p>
-    <h2>Amenities</h2>
-    <ul id="amenities">
-      <!-- Amenities will be added here -->
-    </ul>
-  </section>
-  <section id="reviews-section">
-    <h2>Reviews</h2>
-    <div id="reviews-container">
-      <!-- Reviews will be populated here -->
-    </div>
-  </section>
-  <a href="#" id="add-review-link" class="button">Add Review</a>
-</main>
-<footer>
-  <p>&copy; 2025 All rights reserved</p>
-</footer>
-<script src="scripts.js"></script>
+    <header>
+        <nav>
+            <img src="images/logo.png" alt="" class="logo">
+            <a href="login.html" id="login-link" class="login-button">Login</a>
+            <a href="index.html" id="home-link" class="home-button">Home</a>
+        </nav>
+    </header>
+    <main>
+        <section id="place-details">
+            <!-- Place details will be populated dynamically -->
+        </section>
+        <section id="reviews">
+            <!-- Reviews will be populated dynamically -->
+        </section>
+        <section id="add-review">
+        </section>
+    </main>
+    <footer>
+        <p>© 2024 HBnB Evolution All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
 </body>
 </html>
